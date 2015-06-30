@@ -1,3 +1,7 @@
-/vars/docker_credentials.yml
 target
 .vagrant
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
