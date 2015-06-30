@@ -1,0 +1,9 @@
+# Set the name of the image using your free private repository on docker hub 
+magnolia_docker_image: nicolasbarbe/quickstart-project
+
+# mysql credentials
+mysql_user: magnolia
+mysql_password: mysecretpassword
+mysql_root_password: myVerySecretPassword
+mysql_defaul_port: 3306
+

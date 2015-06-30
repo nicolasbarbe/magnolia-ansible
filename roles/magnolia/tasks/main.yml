@@ -1,0 +1,86 @@
+---
+- name: Calculate instance name
+  set_fact: instance_name="mgnl_{{instance_type}}"
+
+
+##
+## Configure MySQL
+##
+
+- name: Calculate db address
+  set_fact: mysql_address="{{ hostvars[inventory_hostname]['ansible_' + private_net_iface].ipv4.address}}"
+
+- name: Create mysql schema 
+  mysql_db: 
+    name: "{{instance_name}}" 
+    state: present
+    login_host: "{{ mysql_address }}"
+    login_port: 3306
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Grant access to mysql schema 
+  mysql_user: 
+    name: "{{mysql_user}}" 
+    password: "{{mysql_password}}"
+    priv: "*.*:ALL"
+    host: '%' 
+    state: present
+    login_host: "{{ mysql_address }}"
+    login_port: 3306
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+
+##
+## Install Magnolia
+##
+
+- name: Start Magnolia instance
+  docker: 
+    docker_api_version: "1.17"
+    image: "{{ magnolia_docker_image }}"
+    name: "{{instance_name}}_{{item}}"
+    hostname: "{{instance_name}}_{{item}}"
+    name: "{{instance_name}}_{{item}}"
+    ports: "{{port+item|int}}:8080"
+    env: 
+      INSTANCE_TYPE: "{{instance_type}}_{{db_type}}"
+      DB_SCHEMA: "{{instance_name}}"
+      DB_USERNAME: "{{mysql_user}}"
+      DB_PASSWORD: "{{mysql_password}}"
+      DB_ADDRESS: "{{mysql_address}}"
+      DB_PORT: 3306
+      MAGNOLIA_HOME: /var/lib/tomcat7/webapps/ROOT
+  with_sequence: start=0 end={{ count|int - 1 }}
+
+- name: Wait for container instance to come up    
+  wait_for: port={{port+item|int}} delay=10
+  with_sequence: start=0 end={{ count|int - 1 }}
+
+- name: Wait for Magnolia to come up
+  uri: 
+    url: "http://{{ hostvars[inventory_hostname]['ansible_' + private_net_iface].ipv4.address }}:{{port+item|int}}/.healthcheck/" 
+    status_code: 200
+    timeout: 999999999999999
+  with_sequence: start=0 end={{ count|int - 1 }}
+  retries: 30
+  delay: 60
+
+
+##
+## Configure Public instances
+##
+
+- name: Declare ONLY THE FIRST public instance of the cluster to the author as a subscriber
+  uri: 
+    url: "http://{{hostvars[author]['ansible_' + private_net_iface].ipv4.address}}:{{hostvars[author].port}}/.rest/subscribers/v1/{{inventory_hostname_short}}?url=http://{{ hostvars[inventory_hostname]['ansible_' + private_net_iface].ipv4.address}}:{{port}}/"
+    method: PUT 
+    user: superuser 
+    password: superuser
+    force_basic_auth: yes
+    status_code: 200,409
+  when: instance_type == "public"
+  retries: 3
+  delay: 60
+  

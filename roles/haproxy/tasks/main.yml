@@ -1,0 +1,12 @@
+---
+# This role installs HAProxy and configures it.
+
+- name: Configure the haproxy cnf file with hosts
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+
+- name: Start haproxy
+  docker: 
+    docker_api_version: "1.17"
+    image: "dockerfile/haproxy"
+    ports: "80:80"
+    volumes: "/etc/haproxy/:/haproxy-override"

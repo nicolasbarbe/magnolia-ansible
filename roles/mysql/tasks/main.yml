@@ -1,0 +1,33 @@
+- name: Install python pip
+  apt: name=python-pip state=present
+
+- name: Make sure pip upgraded
+  command: easy_install -U pip
+
+- name: Install Python dev (required by MySQL package)
+  apt: name=python-dev state=present
+
+- name: Install libmysql dev (required by MySQL package)
+  apt: name=libmysqlclient-dev state=present
+
+- name: Install Mysql package 
+  pip: name=MySQL-python
+
+- name: Install Mysql database
+  docker: 
+    docker_api_version: "1.17"
+    image: "mysql"
+    hostname: db
+    name: db
+    ports: "3306:3306"
+    env:
+      MYSQL_USER: "{{mysql_user}}"
+      MYSQL_PASSWORD: "{{mysql_password}}"
+      MYSQL_ROOT_PASSWORD: "{{mysql_root_password}}"
+      SERVICE_NAME: db
+
+- name: Wait for Mysql database ready
+  wait_for: 
+    host: "{{ hostvars[inventory_hostname]['ansible_' + private_net_iface].ipv4.address }}"
+    port: "{{mysql_defaul_port}}"
+    delay: 5

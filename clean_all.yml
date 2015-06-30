@@ -1,0 +1,17 @@
+
+- hosts: all
+  sudo: yes
+
+  tasks:
+
+  - name: Stop all containers
+    shell: docker stop --time=30 $(docker ps -a -q) 
+    ignore_errors: True 
+
+  - name: Remove all containers
+    shell: docker rm $(docker ps -a -q)
+    ignore_errors: True 
+
+  - name: Remove all images
+    shell: docker rmi $(docker images -q)
+    ignore_errors: True 

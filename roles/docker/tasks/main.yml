@@ -1,0 +1,22 @@
+## Install Docker
+
+# Run the equivalent of "apt-get update"
+- apt: update_cache=yes
+
+- name: Install Docker
+  apt: name=docker.io state=present
+
+- name: Install python pip
+  apt: name=python-pip state=present
+
+- name: Make sure pip upgraded
+  command: easy_install -U pip
+
+- name: Install docker-py
+  pip: name=docker-py version=1.1.0
+
+- name: Install httplib2
+  pip: name=httplib2
+
+- name: Start Docker service
+  service: name=docker state=started 

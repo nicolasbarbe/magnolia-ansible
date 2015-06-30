@@ -1,0 +1,14 @@
+[all:vars]
+private_net_iface=eth1
+
+# Deploy a Magnolia public instance on each host with the specified amount of nodes in the cluster
+[magnolia-publics]
+instance1.local cluster_node_count=2 author="instance3.local" port="9000"
+instance2.local cluster_node_count=2 author="instance3.local" port="9000"
+
+# Deploy a Magnolia author instance (clustering not availble on authors)
+[magnolia-authors]
+instance3.local port="9000"
+
+[lbservers]
+instance1.local
