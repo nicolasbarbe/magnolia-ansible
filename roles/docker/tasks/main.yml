@@ -1,7 +1,10 @@
 ## Install Docker
 
-# Run the equivalent of "apt-get update"
-- apt: update_cache=yes
+- name: Add debian backport repository
+  apt_repository: repo='deb http://http.debian.net/debian jessie-backports main' state=present
+
+- name: Run the equivalent of "apt-get update"
+  apt: update_cache=yes
 
 - name: Install Docker
   apt: name=docker.io state=present

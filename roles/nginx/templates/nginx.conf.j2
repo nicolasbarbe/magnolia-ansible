@@ -1,0 +1,20 @@
+upstream publics {
+  least_conn;
+
+  {% for host in groups['magnolia-publics'] %}
+    {% for idx in range(0, hostvars[host].cluster_node_count) %}
+      server {{ hostvars[host]['ansible_' + private_net_iface].ipv4.address }}:{{ hostvars[host].port + idx }} max_fails=3 fail_timeout=60 weight=1;
+    {% endfor %}
+  {% endfor %}
+}
+
+server {
+  listen *:80;
+
+  charset utf-8;
+
+  location / {
+    proxy_pass http://publics/;  
+  }
+ 
+}

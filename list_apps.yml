@@ -5,7 +5,7 @@
   tasks:
 
   - name: List all containers
-    shell: docker ps  
+    shell: docker ps -a
     register: apps
     ignore_errors: True 
 

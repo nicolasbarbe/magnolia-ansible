@@ -1,11 +1,11 @@
 Vagrant.configure(2) do |config|
   
-  config.vm.box = "ubuntu/vivid64"
-  config.vm.box_url = "ubuntu/vivid64"
+  config.vm.box = "debian/jessie64"
+  config.vm.box_url = "debian/jessie64"
   
   config.vm.provider "virtualbox" do |v|
-    v.memory = 2048
-    v.cpus = 2
+    v.memory = 1500
+    v.cpus = 1
   end
 
   {

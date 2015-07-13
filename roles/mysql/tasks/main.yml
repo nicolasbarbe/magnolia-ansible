@@ -15,7 +15,7 @@
 
 - name: Install Mysql database
   docker: 
-    docker_api_version: "1.17"
+    docker_api_version: "{{docker_api_version}}"
     image: "mysql"
     hostname: db
     name: db

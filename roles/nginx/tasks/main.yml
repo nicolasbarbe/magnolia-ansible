@@ -1,0 +1,21 @@
+---
+# This role installs Nginx and configures it.
+
+- name: Assures /etc/nginx/ dir exists on the host
+  file: path=/etc/nginx/conf.d/ state=directory
+
+- name: Configure the nginx cnf file with hosts
+  template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/nginx.conf
+
+- name: Start nginx
+  docker: 
+    docker_api_version: "{{docker_api_version}}"
+    image: "nginx"
+    name: "load_balancer"
+    ports: 
+      - "80:80"
+      - "8080:8080"
+    volumes: "/etc/nginx/conf.d:/etc/nginx/conf.d:ro"
+
+- name: Reload configuration
+  command: docker kill -s HUP load_balancer

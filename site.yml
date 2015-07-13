@@ -5,27 +5,25 @@
   roles:
     - docker
 
-# - hosts: lbservers
-#   sudo: yes
-#   roles:
-#     - haproxy
+- hosts: lbservers
+  sudo: yes
+  roles:
+    - nginx
 
 - hosts: magnolia-authors
   sudo: yes
   vars:
-    count: 1
     instance_type: author
     db_type: mysql
   roles:
     - mysql
-    - magnolia
+    - { role: magnolia, count: 1}
 
 - hosts: magnolia-publics
   sudo: yes
   vars:
-    count: "{{ cluster_node_count|default(1)|int }}"
     instance_type: public
     db_type: mysql_cluster
   roles:
     - mysql
-    - magnolia
+    - { role: magnolia, count: "{{ cluster_node_count }}" }

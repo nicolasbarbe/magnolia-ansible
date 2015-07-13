@@ -7,3 +7,5 @@ mysql_password: mysecretpassword
 mysql_root_password: myVerySecretPassword
 mysql_defaul_port: 3306
 
+# Docker API version to use
+docker_api_version: 1.18
